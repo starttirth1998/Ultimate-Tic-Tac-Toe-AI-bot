@@ -4,17 +4,13 @@ import signal
 import time
 import copy
 
-from team71 import Player71
-
-from P4 import player4
-from dunedain import Aragon
 from my import MyPlayer
-from player1 import Player1
-from team13cp import Player13
-from new import pplayer
-from team75 import Player75
-
 import team44
+from P4 import player4
+#from team13cp import Player13
+from dunedain import Aragon
+
+from team71 import Player71
 
 class TimedOutExc(Exception):
 	pass
@@ -125,7 +121,7 @@ class Board:
 
 		if cntx+cnto+cntd <16:		#if all blocks have not yet been won, continue
 			return ('CONTINUE', '-')
-		elif cntx+cnto+cntd == 16:							#if game is drawn
+		elif cntx+cnto+cntd == 16:				#if game is drawn
 			return ('NONE', 'DRAW')
 
 	def check_valid_move(self, old_move, new_move):
@@ -177,7 +173,7 @@ class Board:
 		return 'SUCCESSFUL'
 
 def gameplay(obj1, obj2):				#game simulator
-
+	maxi = -10
 	game_board = Board()
 	fl1 = 'x'
 	fl2 = 'o'
@@ -196,7 +192,7 @@ def gameplay(obj1, obj2):				#game simulator
 		temp_block_status = copy.deepcopy(game_board.block_status)
 		signal.alarm(TIME)
 
-		try:									#try to get player 1's move
+		try:
 			p1_move = obj1.move(game_board, old_move, fl1)
 		except TimedOutExc:					#timeout error
 #			print e
@@ -244,14 +240,15 @@ def gameplay(obj1, obj2):				#game simulator
 		signal.alarm(TIME)
 
 		try:
+			start_time = time.time()									#try to get player 1's move
 			p2_move = obj2.move(game_board, old_move, fl2)
+			maxi = max(maxi,time.time()-start_time)
 		except TimedOutExc:
 			WINNER = 'P1'
 			MESSAGE = 'TIME OUT'
 			pts1 = 16
 			break
 		except Exception as e:
-			print "1",e
 			WINNER = 'P1'
 			MESSAGE = 'INVALID MOVE'
 			pts1 = 16
@@ -284,6 +281,7 @@ def gameplay(obj1, obj2):				#game simulator
 
 	game_board.print_board()
 
+	print "Max Time:",maxi
 	print "Winner:", WINNER
 	print "Message", MESSAGE
 
@@ -323,8 +321,9 @@ if __name__ == '__main__':
 		obj2 = Random_Player()
 
 	elif option == '2':
-		obj2 = Player13()
-		obj1 = Player71()
+		obj1 = Aragon()
+		obj2 = Player71()
+		#Player71 = obj2
 	elif option == '3':
 		obj1 = Manual_Player()
 		obj2 = Manual_Player()
